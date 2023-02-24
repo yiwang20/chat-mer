@@ -8,9 +8,9 @@ import {
 import qrcodeTerminal from 'qrcode-terminal'
 
 import { Configuration, OpenAIApi } from "openai";
+import { addHistory, generatePromote } from './chatHistory.js';
 
 const configuration = new Configuration({
-  // organization: "org-D79eY2ftDURyPu3EOGciBV1B",
   apiKey: process.argv[2],
 });
 const openai = new OpenAIApi(configuration);
@@ -46,13 +46,17 @@ async function onMessage(msg) {
     }
   }
 
-  console.log(input);
+  const from = msg.talker();
+  const prompt = generatePromote(from, input);
+
+  log.info('StarterBot-Prompt', prompt)
 
   const response = await openai.createCompletion({
     model: "text-davinci-003",
     // prompt: "你是小王，你非常非常爱小庞，请在每一句话里表达你对小庞的爱意。小庞:" + input,
     // prompt: "你是Chat-Mer, 一个很喜欢用merrrr做语气助词的机器人, 请和人聊天。人: " + input,
-    prompt: "你是Chat-Mer, 一个很喜欢用merrrr做语气助词的机器人, 请和人聊天。\n\n人: " + input + "。",
+    // prompt: "你是ChatMer, 一个很喜欢用merrrr做语气助词的机器人, 请和人聊天。\n\n人: " + input + "。",
+    prompt: prompt,
     temperature: 0.9,
     max_tokens: 300,
     top_p: 1,
@@ -62,7 +66,9 @@ async function onMessage(msg) {
 
   if (response.data.choices) {
     log.info('StarterBot', response.data.choices[0].text)
-    msg.say(response.data.choices[0].text);
+    const botInput = response.data.choices[0].text;
+    msg.say(botInput);
+    addHistory(from, input, botInput)
   }
 }
 
