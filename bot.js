@@ -47,6 +47,10 @@ async function onMessage(msg) {
   }
 
   const from = msg.talker();
+  if(from && from.payload && from.payload.name === "微信团队"){
+    return;
+  }
+
   const name = room ? room : from;
   const prompt = generatePromote(name, input);
 
