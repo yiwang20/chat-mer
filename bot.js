@@ -1,47 +1,47 @@
- import 'dotenv/config.js'
+import 'dotenv/config.js'
 
- import {
+import {
   WechatyBuilder,
   ScanStatus,
   log,
-}                     from 'wechaty'
+} from 'wechaty'
 import qrcodeTerminal from 'qrcode-terminal'
 
 import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
-    // organization: "org-D79eY2ftDURyPu3EOGciBV1B",
-    apiKey: "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",
+  // organization: "org-D79eY2ftDURyPu3EOGciBV1B",
+  apiKey: process.argv[2],
 });
 const openai = new OpenAIApi(configuration);
 
 // console.log(response.data.choices[0].text);
 
-function onScan (qrcode, status) {
+function onScan(qrcode, status) {
   console.log(`Scan QR Code to login: ${status}\nhttps://wechaty.js.org/qrcode/${encodeURIComponent(qrcode)}`)
 }
 
-function onLogin (user) {
+function onLogin(user) {
   log.info('StarterBot', '%s login', user)
 }
 
-function onLogout (user) {
+function onLogout(user) {
   log.info('StarterBot', '%s logout', user)
 }
 
-async function onMessage (msg) {
+async function onMessage(msg) {
   log.info('StarterBot', msg.toString())
-  if(msg.self()){
+  if (msg.self()) {
     return;
   }
 
   const room = await msg.room();
   const mentioned = await msg.mentionSelf();
   let input = msg.text();
-  if(room){
-    if(!mentioned){
+  if (room) {
+    if (!mentioned) {
       return;
-    }else{
+    } else {
       input = input.replace("@Chat-Mer", "")
     }
   }
@@ -58,9 +58,9 @@ async function onMessage (msg) {
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0.6
-  });  
-  
-  if(response.data.choices){
+  });
+
+  if (response.data.choices) {
     log.info('StarterBot', response.data.choices[0].text)
     msg.say(response.data.choices[0].text);
   }
@@ -83,9 +83,9 @@ const bot = WechatyBuilder.build({
   // puppet: 'wechaty-puppet-wechat',
 })
 
-bot.on('scan',    onScan)
-bot.on('login',   onLogin)
-bot.on('logout',  onLogout)
+bot.on('scan', onScan)
+bot.on('login', onLogin)
+bot.on('logout', onLogout)
 bot.on('message', onMessage)
 
 bot.start().then(() => log.info('StarterBot', 'Starter Bot Started.')).catch(e => log.error('StarterBot', e))
