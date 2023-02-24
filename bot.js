@@ -47,7 +47,8 @@ async function onMessage(msg) {
   }
 
   const from = msg.talker();
-  const prompt = generatePromote(from, input);
+  const name = room ? room : from;
+  const prompt = generatePromote(name, input);
 
   log.info('StarterBot-Prompt', prompt)
 
@@ -68,7 +69,7 @@ async function onMessage(msg) {
     log.info('StarterBot', response.data.choices[0].text)
     const botInput = response.data.choices[0].text;
     msg.say(botInput);
-    addHistory(from, input, botInput)
+    addHistory(name, input, botInput)
   }
 }
 
