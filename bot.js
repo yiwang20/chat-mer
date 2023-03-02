@@ -15,8 +15,6 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-// console.log(response.data.choices[0].text);
-
 function onScan(qrcode, status) {
   console.log(`Scan QR Code to login: ${status}\nhttps://wechaty.js.org/qrcode/${encodeURIComponent(qrcode)}`)
 }
@@ -54,24 +52,21 @@ async function onMessage(msg) {
   const name = room ? room : from;
   const prompt = generatePromote(name, input);
 
-  log.info('StarterBot-Prompt', prompt)
+  // log.info('StarterBot-Prompt', prompt)
 
-  const response = await openai.createCompletion({
-    model: "text-davinci-003",
-    // prompt: "你是小王，你非常非常爱小庞，请在每一句话里表达你对小庞的爱意。小庞:" + input,
-    // prompt: "你是Chat-Mer, 一个很喜欢用merrrr做语气助词的机器人, 请和人聊天。人: " + input,
-    // prompt: "你是ChatMer, 一个很喜欢用merrrr做语气助词的机器人, 请和人聊天。\n\n人: " + input + "。",
-    prompt: prompt,
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: prompt,
     temperature: 0.9,
-    max_tokens: 300,
+    max_tokens: 500,
     top_p: 1,
     frequency_penalty: 0,
-    presence_penalty: 0.6
+    presence_penalty: 0.2
   });
 
   if (response.data.choices) {
-    log.info('StarterBot', response.data.choices[0].text)
-    const botInput = response.data.choices[0].text;
+    // console.log(response.data.choices[0].message.content);
+    const botInput = response.data.choices[0].message.content;
     msg.say(botInput);
     addHistory(name, input, botInput)
   }
