@@ -1,5 +1,5 @@
 const map = {};
-const systemMessage = {role: 'system', content: "你是ChatMer, 一个很偶尔用merrrr做语气助词的机器人，你比较傲娇."};
+const systemMessage = {role: 'system', content: "你是ChatMer, 你偶尔用文字表情，你非常乐于助人."};
 
 export const addHistory = (name, humanInput, botInput) => {
     if(!map[name]){
